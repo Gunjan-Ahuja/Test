@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8081" doc:name="HTTP Listener Configuration"/>
+    <spring:beans>
+        <spring:bean id="Bean" name="Bean" class="java.util.HashMap"/>
+    </spring:beans>
+  <!--   <spring:beans>
+        <spring:bean id="Bean"  class="springb.Sp" name="Bean">
+            <spring:property name="name" value="Gunjan"/>
+        </spring:bean>
+    </spring:beans> -->
+    <flow name="springbFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/test" doc:name="HTTP"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <expression-component doc:name="Expression"><![CDATA[app.registry.get('Bean').put('Name',message.inboundProperties.'http.query.params'.['name'])]]></expression-component>
+        <expression-component doc:name="Expression"><![CDATA[app.registry.get('Bean').get('Name')]]></expression-component>
+       <!--  <set-variable variableName="name" value="#[message.inboundProperties.'http.query.params'.['name']]" doc:name="Variable"/>
+        <object-to-string-transformer doc:name="Object to String"/> -->
+        <logger message="exp: #[payload],#[app.registry.get('Bean')],name: #[app.registry.get('Bean').get('Name')]" level="INFO" doc:name="Logger"/>
+    </flow>
+</mule>
